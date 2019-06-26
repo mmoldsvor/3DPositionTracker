@@ -27,30 +27,31 @@ class Plotter:
             if self.drawn_items['left_line'] is None:
                 self.drawn_items['left_line'], = self.draw_line(left.xyz, self.position.xyz, 'blue')
             else:
-                self.drawn_items['left_line'].set_data_3d(zip(left.xyz, self.position.xyz))
+                print([value for value in zip(left.xyz, self.position.xyz)])
+                self.drawn_items['left_line'].set_data_3d(list(zip(left.xyz, self.position.xyz)))
 
             if self.drawn_items['right_line'] is None:
                 self.drawn_items['right_line'], = self.draw_line(right.xyz, self.position.xyz, 'blue')
             else:
-                self.drawn_items['right_line'].set_data_3d(zip(right.xyz, self.position.xyz))
+                self.drawn_items['right_line'].set_data_3d(list(zip(right.xyz, self.position.xyz)))
 
             if self.drawn_items['left_xy_line'] is None:
                 self.drawn_items['left_xy_line'], = self.draw_line((*left.xy, 0), (*self.position.xy, 0), 'black',
                                                                    linestyle='--')
             else:
-                self.drawn_items['left_xy_line'].set_data_3d(zip((*left.xy, 0), (*self.position.xy, 0)))
+                self.drawn_items['left_xy_line'].set_data_3d(list(zip((*left.xy, 0), (*self.position.xy, 0))))
 
             if self.drawn_items['right_xy_line'] is None:
                 self.drawn_items['right_xy_line'], = self.draw_line((*left.xy, 0), (*self.position.xy, 0), 'black',
                                                                     linestyle='--')
             else:
-                self.drawn_items['right_xy_line'].set_data_3d(zip((*right.xy, 0), (*self.position.xy, 0)))
+                self.drawn_items['right_xy_line'].set_data_3d(list(zip((*right.xy, 0), (*self.position.xy, 0))))
 
             if self.drawn_items['intersection_line'] is None:
                 self.drawn_items['intersection_line'], = self.draw_line((*self.position.xy, 0), self.position.xyz,
                                                                         'black', linestyle='--')
             else:
-                self.drawn_items['intersection_line'].set_data_3d(zip((*self.position.xy, 0), self.position.xyz))
+                self.drawn_items['intersection_line'].set_data_3d(list(zip((*self.position.xy, 0), self.position.xyz)))
         else:
             plot.cla()
             self.drawn_items = dict.fromkeys(self.drawn_items, None)
@@ -77,8 +78,10 @@ class Plotter:
         for position in self.camera_positions:
             self.draw_point(position.xyz, 'red')
 
-    def pause(self, milliseconds):
+    @staticmethod
+    def pause(milliseconds):
         plot.pause(milliseconds/1000)
 
-    def show(self):
+    @staticmethod
+    def show():
         plot.show()

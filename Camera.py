@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
     plotter = Plotter((camera1, camera2))
     plotter.start()
-    plotter.show()
+    Plotter.show()
 
     while True:
         tracker1.run()
@@ -157,7 +157,7 @@ if __name__ == '__main__':
             plotter.position = None
 
         plotter.update()
-        plotter.pause(10)
+        Plotter.pause(10)
 
     tracker1.video_capture.release()
     cv2.destroyAllWindows()
