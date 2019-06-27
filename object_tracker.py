@@ -30,7 +30,7 @@ class ObjectTracker:
 
     def run(self):
         """
-        Captures and modifies picture to mask out contours to be tracked. Renders bounding circle and centroid
+        Captures and modifies picture to mask out contours to be tracked. Renders bounding box and centroid
         """
         current_frame = self.video_capture.read()[1]
         resized_frame = cv2.resize(current_frame, self.size)
@@ -47,7 +47,7 @@ class ObjectTracker:
 
     def find_contours(self, frame, mask):
         """
-        Finds the largest contour of given color based on mask parameter. Renders bounding circle and center of object,
+        Finds the largest contour of given color based on mask parameter. Renders bounding box and center of object,
         and sets the center value if contour is found, None otherwise
         :param frame: numpy.array
              The cv2 representation of the image
@@ -58,12 +58,12 @@ class ObjectTracker:
 
         if len(contours) > 0:
             largest_contour = max(contours, key=cv2.contourArea)
-            ((x, y), radius) = cv2.minEnclosingCircle(largest_contour)
+            x, y, w, h = cv2.boundingRect(largest_contour)
             moments = cv2.moments(largest_contour)
             self.center = (int(moments['m10'] / moments['m00']), int(moments['m01'] / moments['m00']))
 
-            if radius > 10:
-                cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
+            if w > 10 and h > 10:
+                cv2.rectangle(frame, (int(x), int(y)), (int(x+w), int(y+h)), (0, 255, 255), 2)
                 cv2.circle(frame, self.center, 5, (0, 0, 255), -1)
         else:
             self.center = None
