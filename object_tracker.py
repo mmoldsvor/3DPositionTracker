@@ -1,8 +1,14 @@
 import cv2
+import numpy
 
 
 class ObjectTracker:
-    def __init__(self, identifier: int, size, lower_range, upper_range, capture=0):
+    def __init__(self,
+                 identifier: int,
+                 size: tuple[int, int],
+                 lower_range: numpy.array[int, int, int],
+                 upper_range: numpy.array[int, int, int],
+                 capture=0):
         """
         Initializes a tracker that can keep track on a single object in a specified color range.
         Tracks the largest contour of specified color
@@ -45,7 +51,7 @@ class ObjectTracker:
         self.find_contours(horizontal_frame, mask)
         cv2.imshow('window{}'.format(self.identifier), horizontal_frame)
 
-    def find_contours(self, frame, mask):
+    def find_contours(self, frame: numpy.array, mask: numpy.array):
         """
         Finds the largest contour of given color based on mask parameter. Renders bounding box and center of object,
         and sets the center value if contour is found, None otherwise

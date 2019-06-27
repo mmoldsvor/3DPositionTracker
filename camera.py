@@ -2,9 +2,13 @@ from vector import Vector
 import numpy
 from object_tracker import ObjectTracker
 
+from typing import Optional
 
 class Camera:
-    def __init__(self, position: Vector, angle: tuple, field_of_view: tuple, tracker: ObjectTracker=None):
+    def __init__(self, position: Vector,
+                 angle: tuple[float, float],
+                 field_of_view: tuple[float, float],
+                 tracker: ObjectTracker = None):
         """
         Initialization of the camera instance.
 
@@ -30,7 +34,7 @@ class Camera:
             self.ratio = self.tracker.get_converted_centroid()
 
     @staticmethod
-    def triangulate(cameras: tuple):
+    def triangulate(cameras: tuple) -> Optional[tuple[float, float, float]]:
         """
         Derives the intersection point of the object by triangulating the position in which the object is displayed
         by the two cameras
@@ -53,7 +57,7 @@ class Camera:
             return x, y, height
 
     @staticmethod
-    def intersection(point1: Vector, vector1: Vector, point2: Vector, vector2: Vector):
+    def intersection(point1: Vector, vector1: Vector, point2: Vector, vector2: Vector) -> Optional[tuple[float, float]]:
         """
         Calculates the intersection point between two lines, where each line has two known points
 
@@ -82,7 +86,8 @@ class Camera:
         return None
 
     @staticmethod
-    def calculate_average_height(cameras: tuple, left_vector: Vector, right_vector: Vector, intersection: tuple):
+    def calculate_average_height(cameras: tuple, left_vector: Vector, right_vector: Vector,
+                                 intersection: tuple[float, float]):
         """
         Calculates the average height of the object being tracked from the two cameras
 
@@ -106,7 +111,7 @@ class Camera:
 
         return (height_left + height_right)/2
 
-    def calculate_vector(self):
+    def calculate_vector(self) -> Vector:
         """
         Calculates a vector based on the camera field of view, angle and the ratio of which the object being tracked
         was detected
@@ -123,7 +128,7 @@ class Camera:
 
         return Vector(numpy.cos(theta_x)*numpy.cos(theta_y), numpy.sin(theta_x)*numpy.cos(theta_y), numpy.sin(theta_y))
 
-    def get_fov_xy_vectors(self):
+    def get_fov_xy_vectors(self) -> tuple[Vector, Vector]:
         """
         Generates a Vector for each direction of the field of view in the xy plane
         :return: Vector, Vector

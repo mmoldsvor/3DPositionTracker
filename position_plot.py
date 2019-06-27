@@ -1,9 +1,12 @@
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plot
+from camera import Camera
 
 
 class PositionPlot:
-    def __init__(self, cameras, bounds=((0, 5), (0, 5), (0, 5))):
+    def __init__(self,
+                 cameras: tuple[Camera, Camera],
+                 bounds: tuple[[int, int], [int, int], [int, int]] = ((0, 5), (0, 5), (0, 5))):
         self.position = None
         self.cameras = cameras
 
@@ -15,7 +18,7 @@ class PositionPlot:
 
         # tuple (start, end, color, linestyle)
         self.lines = {'left_line': None, 'right_line': None, 'left_xy_line': None, 'right_xy_line': None,
-                        'intersection_line': None}
+                      'intersection_line': None}
         # tuple (x, y, z, color)
         self.points = {'object': None, 'object_xy': None}
 
@@ -27,11 +30,11 @@ class PositionPlot:
         for camera in self.cameras:
             self.draw_point(camera.position.xyz, 'red')
             for fov in camera.get_fov_xy_vectors():
-                self.draw_line(camera.position.xyz, (camera.position + (fov*7)).xyz, 'green')
+                self.draw_line(camera.position.xyz, (camera.position + (fov * 7)).xyz, 'green')
 
     def update(self):
         left, right = tuple(camera.position for camera in self.cameras)
-        average_z = (left.z + right.z)/2
+        average_z = (left.z + right.z) / 2
         if self.position is not None:
             self.points['object'] = (self.position.xyz, 'red')
             self.points['object_xy'] = ((*self.position.xy, average_z), 'grey')
@@ -67,7 +70,8 @@ class PositionPlot:
                 self.start()
                 self.draw_static_objects()
 
-    def draw_line(self, start, end, color='black', linestyle='-'):
+    def draw_line(self, start: tuple[float, float, float], end: tuple[float, float, float], color: str = 'black',
+                  linestyle: str = '-'):
         x1, y1, z1 = start
         x2, y2, z2 = end
 
@@ -88,7 +92,7 @@ class PositionPlot:
 
     @staticmethod
     def pause(milliseconds):
-        plot.pause(milliseconds/1000)
+        plot.pause(milliseconds / 1000)
 
     @staticmethod
     def show():
