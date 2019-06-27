@@ -11,8 +11,8 @@ if __name__ == '__main__':
 
     tracker1 = ObjectTracker(1, (711, 400), lower, upper)
     #tracker2 = Tracker(2, (711, 400), lower, upper)
-    camera1 = Camera(Vector(1, 0, 0), ((90*numpy.pi)/180, 0), ((60*numpy.pi)/180, (47*numpy.pi)/180), tracker1)
-    camera2 = Camera(Vector(5, 0, 0), ((90 * numpy.pi)/180, 0), ((60*numpy.pi)/180, (47*numpy.pi)/180), tracker1)
+    camera1 = Camera(Vector(1, 0, 1), ((80*numpy.pi)/180, 0), ((60*numpy.pi)/180, (47*numpy.pi)/180), tracker1)
+    camera2 = Camera(Vector(5, 0, 1), ((100 * numpy.pi)/180, 0), ((60*numpy.pi)/180, (47*numpy.pi)/180), tracker1)
 
     plotter = PositionPlot((camera1, camera2), ((0, 6), (0, 6), (0, 5)))
     plotter.start()
@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
         plotter.update()
         plotter.update_draw()
-        PositionPlot.pause(10)
+        PositionPlot.pause(1)
 
     tracker1.video_capture.release()
     #tracker2.video_capture.release()

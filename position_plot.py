@@ -31,15 +31,16 @@ class PositionPlot:
 
     def update(self):
         left, right = tuple(camera.position for camera in self.cameras)
+        average_z = (left.z + right.z)/2
         if self.position is not None:
             self.points['object'] = (self.position.xyz, 'red')
-            self.points['object_xy'] = ((*self.position.xy, 0), 'grey')
+            self.points['object_xy'] = ((*self.position.xy, average_z), 'grey')
 
             self.lines['left_line'] = (left.xyz, self.position.xyz, 'blue', '-')
             self.lines['right_line'] = (right.xyz, self.position.xyz, 'blue', '-')
-            self.lines['left_xy_line'] = ((*left.xy, 0), (*self.position.xy, 0), 'grey', '--')
-            self.lines['right_xy_line'] = ((*right.xy, 0), (*self.position.xy, 0), 'grey', '--')
-            self.lines['intersection_line'] = ((*self.position.xy, 0), self.position.xyz, 'grey', '--')
+            self.lines['left_xy_line'] = ((*left.xy, average_z), (*self.position.xy, average_z), 'grey', '--')
+            self.lines['right_xy_line'] = ((*right.xy, average_z), (*self.position.xy, average_z), 'grey', '--')
+            self.lines['intersection_line'] = ((*self.position.xy, average_z), self.position.xyz, 'grey', '--')
 
     def update_draw(self):
         if self.position is not None:
@@ -49,7 +50,6 @@ class PositionPlot:
                     if self.drawn_points[key] is None:
                         self.drawn_points[key] = self.draw_point(point, color)
                     else:
-                        print(tuple([value] for value in point))
                         self.drawn_points[key]._offsets3d = tuple([value] for value in point)
 
             for key in self.lines.keys():
