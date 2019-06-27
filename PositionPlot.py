@@ -3,59 +3,69 @@ import matplotlib.pyplot as plot
 
 
 class Plotter:
-    def __init__(self, cameras):
+    def __init__(self, cameras, bounds=((0, 5), (0, 5), (0, 5))):
         self.position = None
         self.cameras = cameras
-        self.camera_positions = tuple(camera.position for camera in cameras)
+
+        self.bounds = bounds
 
         plot.ion()
         self.figure = plot.figure()
         self.axes = self.figure.add_subplot(111, projection='3d')
 
-        self.drawn_items = {'left_line': None, 'right_line': None, 'left_xy_line': None, 'right_xy_line': None,
-                            'object': None, 'intersection_line': None}
+        # tuple (start, end, color, linestyle)
+        self.lines = {'left_line': None, 'right_line': None, 'left_xy_line': None, 'right_xy_line': None,
+                        'intersection_line': None}
+        # tuple (x, y, z, color)
+        self.points = {'object': None, 'object_xy': None}
+
+        self.drawn_lines = {'left_line': None, 'right_line': None, 'left_xy_line': None, 'right_xy_line': None,
+                            'intersection_line': None}
+        self.drawn_points = {'object': None, 'object_xy': None}
+
+    def draw_static_objects(self):
+        for camera in self.cameras:
+            self.draw_point(camera.position.xyz, 'red')
+            for fov in camera.get_fov_xy_vectors():
+                self.draw_line(camera.position.xyz, (camera.position + (fov*7)).xyz, 'green')
 
     def update(self):
-        left, right = self.camera_positions
+        left, right = tuple(camera.position for camera in self.cameras)
         if self.position is not None:
-            if self.drawn_items['object'] is None:
-                self.drawn_items['object'] = self.draw_point(self.position.xyz, 'red')
-            else:
-                # Quite hacky, no good solution
-                self.drawn_items['object']._offsets3d = tuple([value] for value in self.position.xyz)
+            self.points['object'] = (self.position.xyz, 'red')
+            self.points['object_xy'] = ((*self.position.xy, 0), 'grey')
 
-            if self.drawn_items['left_line'] is None:
-                self.drawn_items['left_line'], = self.draw_line(left.xyz, self.position.xyz, 'blue')
-            else:
-                print([value for value in zip(left.xyz, self.position.xyz)])
-                self.drawn_items['left_line'].set_data_3d(list(zip(left.xyz, self.position.xyz)))
+            self.lines['left_line'] = (left.xyz, self.position.xyz, 'blue', '-')
+            self.lines['right_line'] = (right.xyz, self.position.xyz, 'blue', '-')
+            self.lines['left_xy_line'] = ((*left.xy, 0), (*self.position.xy, 0), 'grey', '--')
+            self.lines['right_xy_line'] = ((*right.xy, 0), (*self.position.xy, 0), 'grey', '--')
+            self.lines['intersection_line'] = ((*self.position.xy, 0), self.position.xyz, 'grey', '--')
 
-            if self.drawn_items['right_line'] is None:
-                self.drawn_items['right_line'], = self.draw_line(right.xyz, self.position.xyz, 'blue')
-            else:
-                self.drawn_items['right_line'].set_data_3d(list(zip(right.xyz, self.position.xyz)))
+    def update_draw(self):
+        if self.position is not None:
+            for key in self.points.keys():
+                if self.points[key] is not None:
+                    point, color = self.points[key]
+                    if self.drawn_points[key] is None:
+                        self.drawn_points[key] = self.draw_point(point, color)
+                    else:
+                        print(tuple([value] for value in point))
+                        self.drawn_points[key]._offsets3d = tuple([value] for value in point)
 
-            if self.drawn_items['left_xy_line'] is None:
-                self.drawn_items['left_xy_line'], = self.draw_line((*left.xy, 0), (*self.position.xy, 0), 'black',
-                                                                   linestyle='--')
-            else:
-                self.drawn_items['left_xy_line'].set_data_3d(list(zip((*left.xy, 0), (*self.position.xy, 0))))
-
-            if self.drawn_items['right_xy_line'] is None:
-                self.drawn_items['right_xy_line'], = self.draw_line((*left.xy, 0), (*self.position.xy, 0), 'black',
-                                                                    linestyle='--')
-            else:
-                self.drawn_items['right_xy_line'].set_data_3d(list(zip((*right.xy, 0), (*self.position.xy, 0))))
-
-            if self.drawn_items['intersection_line'] is None:
-                self.drawn_items['intersection_line'], = self.draw_line((*self.position.xy, 0), self.position.xyz,
-                                                                        'black', linestyle='--')
-            else:
-                self.drawn_items['intersection_line'].set_data_3d(list(zip((*self.position.xy, 0), self.position.xyz)))
+            for key in self.lines.keys():
+                if self.lines[key] is not None:
+                    start, end, color, linestyle = self.lines[key]
+                    if self.drawn_lines[key] is None:
+                        self.drawn_lines[key], = self.draw_line(start, end, color, linestyle)
+                    else:
+                        self.drawn_lines[key].set_data_3d(list(zip(start, end)))
         else:
-            plot.cla()
-            self.drawn_items = dict.fromkeys(self.drawn_items, None)
-            self.start()
+            if None not in self.drawn_lines and None not in self.drawn_points:
+                plot.cla()
+                self.drawn_lines = dict.fromkeys(self.drawn_lines, None)
+                self.drawn_points = dict.fromkeys(self.drawn_points, None)
+                self.start()
+                self.draw_static_objects()
 
     def draw_line(self, start, end, color='black', linestyle='-'):
         x1, y1, z1 = start
@@ -71,12 +81,10 @@ class Plotter:
         self.axes.set_ylabel('Y Axis')
         self.axes.set_zlabel('Z Axis')
 
-        self.axes.set_xlim3d(0, 6)
-        self.axes.set_ylim3d(0, 6)
-        self.axes.set_zlim3d(0, 5)
-
-        for position in self.camera_positions:
-            self.draw_point(position.xyz, 'red')
+        x_bound, y_bound, z_bound = self.bounds
+        self.axes.set_xlim3d(*x_bound)
+        self.axes.set_ylim3d(*y_bound)
+        self.axes.set_zlim3d(*z_bound)
 
     @staticmethod
     def pause(milliseconds):

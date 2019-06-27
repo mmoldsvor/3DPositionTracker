@@ -49,9 +49,9 @@ class Camera:
         left, right = cameras
         vector_left, vector_right = left.calculate_vector(), right.calculate_vector()
         intersection = Camera.intersection(left.position, Vector(*vector_left.xy), right.position, Vector(*vector_right.xy))
-        height = Camera.calculate_average_height(cameras, vector_left, vector_right, intersection)
 
         if intersection is not None:
+            height = Camera.calculate_average_height(cameras, vector_left, vector_right, intersection)
             x, y = intersection
             return x, y, height
 
@@ -126,25 +126,42 @@ class Camera:
 
         return Vector(math.cos(theta_x)*math.cos(theta_y), math.sin(theta_x)*math.cos(theta_y), math.sin(theta_y))
 
+    def get_fov_xy_vectors(self):
+        """
+        Generates a Vector for each direction of the field of view in the xy plane
+        :return: Vector, Vector
+            The Vectors describing the edge of the field of view sector
+        """
+        field_of_view, _ = self.field_of_view
+        angle, _ = self.angle
+
+        theta1 = field_of_view + angle - (field_of_view/2)
+        theta2 = angle - (field_of_view/2)
+
+        return Vector(math.cos(theta1), math.sin(theta1)), Vector(math.cos(theta2), math.sin(theta2))
+
 
 if __name__ == '__main__':
     lower = numpy.array([90, 100, 100], dtype=numpy.uint8)
     upper = numpy.array([110, 255, 255], dtype=numpy.uint8)
 
-    tracker1 = Tracker((500, 500), lower, upper)
-    camera1 = Camera(Vector(1, 0, 0), ((3/8)*math.pi, 0), ((1/2)*math.pi, math.pi), tracker1)
-    camera2 = Camera(Vector(5, 0, 0), ((5/8) * math.pi, 0), ((1/2) * math.pi, math.pi), tracker1)
+    tracker1 = Tracker(1, (711, 400), lower, upper)
+    #tracker2 = Tracker(2, (711, 400), lower, upper)
+    camera1 = Camera(Vector(1, 0, 0), ((90*math.pi)/180, 0), ((60*math.pi)/180, (47*math.pi)/180), tracker1)
+    camera2 = Camera(Vector(5, 0, 0), ((90 * math.pi)/180, 0), ((60*math.pi)/180, (47*math.pi)/180), tracker1)
 
-    plotter = Plotter((camera1, camera2))
+    plotter = Plotter((camera1, camera2), ((0, 6), (0, 6), (0, 5)))
     plotter.start()
     Plotter.show()
 
     while True:
         tracker1.run()
+        #tracker2.run()
         key = cv2.waitKey(1)
 
         if key == ord('q'):
             tracker1.video_capture.release()
+            #tracker2.video_capture.release()
             cv2.destroyAllWindows()
 
         for camera in (camera1, camera2):
@@ -157,8 +174,10 @@ if __name__ == '__main__':
             plotter.position = None
 
         plotter.update()
+        plotter.update_draw()
         Plotter.pause(10)
 
     tracker1.video_capture.release()
+    #tracker2.video_capture.release()
     cv2.destroyAllWindows()
 

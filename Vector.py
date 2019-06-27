@@ -21,6 +21,9 @@ class Vector:
     def yz(self):
         return self.y, self.z
 
+    def __getitem__(self, item):
+        return (self.x, self.y, self.z)[item]
+
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y, self.z + other.z)
 

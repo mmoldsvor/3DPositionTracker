@@ -1,10 +1,12 @@
 import numpy
 import cv2
+import random
 
 
 class Tracker:
-    def __init__(self, size, lower_range, upper_range):
-        self.video_capture = cv2.VideoCapture(0)
+    def __init__(self, identifier, size, lower_range, upper_range, capture=0):
+        self.identifier = identifier
+        self.video_capture = cv2.VideoCapture(capture)
 
         self.size = size
         self.center = None
@@ -24,7 +26,7 @@ class Tracker:
         mask = cv2.dilate(mask, None, iterations=2)
 
         self.find_contours(horizontal_frame, mask)
-        cv2.imshow('Mask', horizontal_frame)
+        cv2.imshow('window{}'.format(self.identifier), horizontal_frame)
 
     def find_contours(self, frame, mask):
         contours = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
