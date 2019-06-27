@@ -14,8 +14,8 @@ class Camera:
             The relative angle (radians) of the camera where 0 is right
         :param field_of_view: tuple (fov_x, fov_y)
             The field of view of the camera in radians
-        :param ratio:
-            TEMPORARY
+        :param tracker: ObjectTracker
+            The tracker passing ratio values to the camera
         """
 
         self.position = position
@@ -97,12 +97,12 @@ class Camera:
             The average height of the tracked object
         """
         left, right = cameras
-        left_x, left_z = left_vector.xz
-        right_x, right_z = right_vector.xz
+        left_x, left_y, left_z = left_vector.xyz
+        right_x, left_y, right_z = right_vector.xyz
         intersection_x, _ = intersection
 
-        height_left = left_z * ((intersection_x - left.position.x)/left_x)
-        height_right = right_z * ((intersection_x - right.position.x)/right_x)
+        height_left = left_y + (left_z * ((intersection_x - left.position.x)/left_x))
+        height_right = left_y + (right_z * ((intersection_x - right.position.x)/right_x))
 
         return (height_left + height_right)/2
 
