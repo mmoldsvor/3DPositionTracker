@@ -1,9 +1,8 @@
 import numpy
 import cv2
-import random
 
 
-class Tracker:
+class ObjectTracker:
     def __init__(self, identifier, size, lower_range, upper_range, capture=0):
         self.identifier = identifier
         self.video_capture = cv2.VideoCapture(capture)
@@ -55,7 +54,7 @@ if __name__ == '__main__':
     lower = numpy.array([90, 100, 100], dtype=numpy.uint8)
     upper = numpy.array([110, 255, 255], dtype=numpy.uint8)
 
-    tracker = Tracker((500, 500), lower, upper)
+    tracker = ObjectTracker((500, 500), lower, upper)
 
     tracker.video_capture.release()
     cv2.destroyAllWindows()

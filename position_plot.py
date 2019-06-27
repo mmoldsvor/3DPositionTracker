@@ -2,7 +2,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plot
 
 
-class Plotter:
+class PositionPlot:
     def __init__(self, cameras, bounds=((0, 5), (0, 5), (0, 5))):
         self.position = None
         self.cameras = cameras

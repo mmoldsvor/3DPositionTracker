@@ -1,13 +1,10 @@
-from Vector import Vector
-import math
+from vector import Vector
 import numpy
-import cv2
-from PositionPlot import Plotter
-from ObjectTracker import Tracker
+from object_tracker import ObjectTracker
 
 
 class Camera:
-    def __init__(self, position: Vector, angle: tuple, field_of_view: tuple, tracker: Tracker=None):
+    def __init__(self, position: Vector, angle: tuple, field_of_view: tuple, tracker: ObjectTracker=None):
         """
         Initialization of the camera instance.
 
@@ -124,7 +121,7 @@ class Camera:
         theta_x = (ratio_horizontal*fov_horizontal - fov_horizontal/2) + angle_horizontal
         theta_y = (ratio_vertical*fov_vertical - fov_vertical/2) + angle_vertical
 
-        return Vector(math.cos(theta_x)*math.cos(theta_y), math.sin(theta_x)*math.cos(theta_y), math.sin(theta_y))
+        return Vector(numpy.cos(theta_x)*numpy.cos(theta_y), numpy.sin(theta_x)*numpy.cos(theta_y), numpy.sin(theta_y))
 
     def get_fov_xy_vectors(self):
         """
@@ -138,46 +135,6 @@ class Camera:
         theta1 = field_of_view + angle - (field_of_view/2)
         theta2 = angle - (field_of_view/2)
 
-        return Vector(math.cos(theta1), math.sin(theta1)), Vector(math.cos(theta2), math.sin(theta2))
+        return Vector(numpy.cos(theta1), numpy.sin(theta1)), Vector(numpy.cos(theta2), numpy.sin(theta2))
 
-
-if __name__ == '__main__':
-    lower = numpy.array([90, 100, 100], dtype=numpy.uint8)
-    upper = numpy.array([110, 255, 255], dtype=numpy.uint8)
-
-    tracker1 = Tracker(1, (711, 400), lower, upper)
-    #tracker2 = Tracker(2, (711, 400), lower, upper)
-    camera1 = Camera(Vector(1, 0, 0), ((90*math.pi)/180, 0), ((60*math.pi)/180, (47*math.pi)/180), tracker1)
-    camera2 = Camera(Vector(5, 0, 0), ((90 * math.pi)/180, 0), ((60*math.pi)/180, (47*math.pi)/180), tracker1)
-
-    plotter = Plotter((camera1, camera2), ((0, 6), (0, 6), (0, 5)))
-    plotter.start()
-    Plotter.show()
-
-    while True:
-        tracker1.run()
-        #tracker2.run()
-        key = cv2.waitKey(1)
-
-        if key == ord('q'):
-            tracker1.video_capture.release()
-            #tracker2.video_capture.release()
-            cv2.destroyAllWindows()
-
-        for camera in (camera1, camera2):
-            camera.update_ratio()
-
-        triangulated_position = Camera.triangulate((camera1, camera2))
-        if triangulated_position is not None:
-            plotter.position = Vector(*triangulated_position)
-        else:
-            plotter.position = None
-
-        plotter.update()
-        plotter.update_draw()
-        Plotter.pause(10)
-
-    tracker1.video_capture.release()
-    #tracker2.video_capture.release()
-    cv2.destroyAllWindows()
 
