@@ -1,6 +1,8 @@
 import cv2
 import numpy
 
+from typing import Optional
+
 
 class ObjectTracker:
     def __init__(self,
@@ -74,7 +76,7 @@ class ObjectTracker:
         else:
             self.center = None
 
-    def get_converted_centroid(self):
+    def get_converted_centroid(self) -> Optional[tuple(float, float)]:
         """
         Converts and returns the center position of the largest contour. The values are translated from image position
         to a range from 0 to 1 based on image size.

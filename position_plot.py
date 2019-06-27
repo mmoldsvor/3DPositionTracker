@@ -7,6 +7,14 @@ class PositionPlot:
     def __init__(self,
                  cameras: tuple[Camera, Camera],
                  bounds: tuple[[int, int], [int, int], [int, int]] = ((0, 5), (0, 5), (0, 5))):
+        """
+        Plots tracked object's position in 3D space
+
+        :param cameras: tuple (Camera, Camera)
+        :param bounds: tuple ((x_0, x), (y_0, y), (z_0, z))
+            The bounds of the 3D plot
+        """
+
         self.position = None
         self.cameras = cameras
 
