@@ -2,12 +2,13 @@ from vector import Vector
 import numpy
 from object_tracker import ObjectTracker
 
-from typing import Optional
+from typing import Optional, Tuple
+
 
 class Camera:
     def __init__(self, position: Vector,
-                 angle: tuple[float, float],
-                 field_of_view: tuple[float, float],
+                 angle: Tuple[float, float],
+                 field_of_view: Tuple[float, float],
                  tracker: ObjectTracker = None):
         """
         Initialization of the camera instance.
@@ -34,7 +35,7 @@ class Camera:
             self.ratio = self.tracker.get_converted_centroid()
 
     @staticmethod
-    def triangulate(cameras: tuple) -> Optional[tuple[float, float, float]]:
+    def triangulate(cameras: tuple) -> Optional[Tuple[float, float, float]]:
         """
         Derives the intersection point of the object by triangulating the position in which the object is displayed
         by the two cameras
@@ -57,7 +58,7 @@ class Camera:
             return x, y, height
 
     @staticmethod
-    def intersection(point1: Vector, vector1: Vector, point2: Vector, vector2: Vector) -> Optional[tuple[float, float]]:
+    def intersection(point1: Vector, vector1: Vector, point2: Vector, vector2: Vector) -> Optional[Tuple[float, float]]:
         """
         Calculates the intersection point between two lines, where each line has two known points
 
@@ -86,8 +87,8 @@ class Camera:
         return None
 
     @staticmethod
-    def calculate_average_height(cameras: tuple, left_vector: Vector, right_vector: Vector,
-                                 intersection: tuple[float, float]):
+    def calculate_average_height(cameras: Tuple, left_vector: Vector, right_vector: Vector,
+                                 intersection: Tuple[float, float]):
         """
         Calculates the average height of the object being tracked from the two cameras
 
@@ -102,8 +103,8 @@ class Camera:
             The average height of the tracked object
         """
         left, right = cameras
-        left_x, left_y, left_z = left_vector.xyz
-        right_x, left_y, right_z = right_vector.xyz
+        left_x, left_y, left_z = left_vector
+        right_x, left_y, right_z = right_vector
         intersection_x, _ = intersection
 
         height_left = left_y + (left_z * ((intersection_x - left.position.x)/left_x))
@@ -117,18 +118,21 @@ class Camera:
         was detected
 
         :return: Vector
-            The Vector directed towards the center of the tracked object
+            The Vector directed towards the center of the tracked object if object is being tracked, None otherwise
         """
-        ratio_horizontal, ratio_vertical = self.ratio
-        fov_horizontal, fov_vertical = self.field_of_view
-        angle_horizontal, angle_vertical = self.angle
+        if self.ratio is not None:
+            ratio_horizontal, ratio_vertical = self.ratio
+            fov_horizontal, fov_vertical = self.field_of_view
+            angle_horizontal, angle_vertical = self.angle
 
-        theta_x = (ratio_horizontal*fov_horizontal - fov_horizontal/2) + angle_horizontal
-        theta_y = (ratio_vertical*fov_vertical - fov_vertical/2) + angle_vertical
+            theta_x = (ratio_horizontal * fov_horizontal - fov_horizontal / 2) + angle_horizontal
+            theta_y = (ratio_vertical * fov_vertical - fov_vertical / 2) + angle_vertical
 
-        return Vector(numpy.cos(theta_x)*numpy.cos(theta_y), numpy.sin(theta_x)*numpy.cos(theta_y), numpy.sin(theta_y))
+            return Vector(numpy.cos(theta_x) * numpy.cos(theta_y), numpy.sin(theta_x) * numpy.cos(theta_y),
+                          numpy.sin(theta_y))
+        return None
 
-    def get_fov_xy_vectors(self) -> tuple[Vector, Vector]:
+    def get_fov_xy_vectors(self) -> Tuple[Vector, Vector]:
         """
         Generates a Vector for each direction of the field of view in the xy plane
         :return: Vector, Vector

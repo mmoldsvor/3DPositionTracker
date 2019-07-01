@@ -6,27 +6,31 @@ from vector import Vector
 from position_plot import PositionPlot
 
 if __name__ == '__main__':
-    lower = numpy.array([90, 100, 100], dtype=numpy.uint8)
-    upper = numpy.array([110, 255, 255], dtype=numpy.uint8)
+    done = False
 
-    tracker1 = ObjectTracker(1, (711, 400), lower, upper)
-    #tracker2 = Tracker(2, (711, 400), lower, upper)
-    camera1 = Camera(Vector(1, 0, 1), ((80*numpy.pi)/180, 0), ((60*numpy.pi)/180, (47*numpy.pi)/180), tracker1)
-    camera2 = Camera(Vector(5, 0, 1), ((100 * numpy.pi)/180, 0), ((60*numpy.pi)/180, (47*numpy.pi)/180), tracker1)
+    lower1 = numpy.array([90, 100, 100], dtype=numpy.uint8)
+    upper1 = numpy.array([110, 255, 255], dtype=numpy.uint8)
+    lower2 = numpy.array([90, 60, 60], dtype=numpy.uint8)
+    upper2 = numpy.array([110, 255, 255], dtype=numpy.uint8)
 
-    plotter = PositionPlot((camera1, camera2), ((0, 6), (0, 6), (0, 5)))
+    tracker1 = ObjectTracker(1, (711, 400), lower1, upper1, 0)
+    tracker2 = ObjectTracker(2, (711, 400), lower2, upper2, 1)
+    camera1 = Camera(Vector(0, 0, 1), ((80 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180),
+                     tracker1)
+    camera2 = Camera(Vector(1, 0, 1), ((100 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180),
+                     tracker2)
+
+    plotter = PositionPlot((camera1, camera2), ((-1, 2), (-1, 2), (1, 2)))
     plotter.start()
     PositionPlot.show()
 
-    while True:
+    while not done:
         tracker1.run()
-        #tracker2.run()
+        tracker2.run()
         key = cv2.waitKey(1)
 
         if key == ord('q'):
-            tracker1.video_capture.release()
-            #tracker2.video_capture.release()
-            cv2.destroyAllWindows()
+            done = True
 
         for camera in (camera1, camera2):
             camera.update_ratio()
@@ -42,6 +46,6 @@ if __name__ == '__main__':
         PositionPlot.pause(1)
 
     tracker1.video_capture.release()
-    #tracker2.video_capture.release()
+    tracker2.video_capture.release()
     cv2.destroyAllWindows()
 

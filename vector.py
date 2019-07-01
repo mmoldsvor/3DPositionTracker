@@ -6,10 +6,6 @@ class Vector:
         self.x, self.y, self.z = x, y, z
 
     @property
-    def xyz(self):
-        return self.x, self.y, self.z
-
-    @property
     def xy(self):
         return self.x, self.y
 

@@ -1,15 +1,15 @@
 import cv2
 import numpy
 
-from typing import Optional
+from typing import Optional, Tuple
 
 
 class ObjectTracker:
     def __init__(self,
                  identifier: int,
-                 size: tuple[int, int],
-                 lower_range: numpy.array[int, int, int],
-                 upper_range: numpy.array[int, int, int],
+                 size: Tuple[int, int],
+                 lower_range,
+                 upper_range,
                  capture=0):
         """
         Initializes a tracker that can keep track on a single object in a specified color range.
@@ -76,7 +76,7 @@ class ObjectTracker:
         else:
             self.center = None
 
-    def get_converted_centroid(self) -> Optional[tuple(float, float)]:
+    def get_converted_centroid(self) -> Optional[Tuple[float, float]]:
         """
         Converts and returns the center position of the largest contour. The values are translated from image position
         to a range from 0 to 1 based on image size.
@@ -87,5 +87,5 @@ class ObjectTracker:
         if self.center is not None:
             x, y = self.center
             width, height = self.size
-            return 1 - x/width, 1 - y/height
+            return x / width, 1 - y / height
         return None
