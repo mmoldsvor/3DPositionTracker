@@ -55,18 +55,10 @@ class PositionPlot:
             self.lines['right_xy_line'] = ((*right.xy, average_z), (*self.position.xy, average_z), 'grey', '--')
             self.lines['intersection_line'] = ((*self.position.xy, average_z), self.position, 'grey', '--')
         else:
-            left_camera, right_camera = self.cameras
-            left_vector, right_vector = left_camera.calculate_vector(), right_camera.calculate_vector()
-
-            if left_vector is not None:
-                self.lines['left_line'] = (left, left + (left_vector) * 4, 'red', '--')
-            else:
-                self.lines['left_line'] = None
-
-            if right_vector is not None:
-                self.lines['right_line'] = (right, right + (right_vector) * 4, 'red', '--')
-            else:
-                self.lines['right_line'] = None
+            left_vector, right_vector = tuple(camera.vector for camera in self.cameras)
+            self.lines['left_line'] = (left, left + left_vector * 4, 'red', '--') if left_vector is not None else None
+            self.lines['right_line'] = (
+            right, right + right_vector * 4, 'red', '--') if right_vector is not None else None
 
     def update_draw(self):
         if self.position is not None:
@@ -84,7 +76,6 @@ class PositionPlot:
                 self.drawn_points = dict.fromkeys(self.drawn_points, None)
                 self.start()
 
-            # Test
             for key in ('left_line', 'right_line'):
                 if self.lines[key] is not None:
                     self.display_line(key)

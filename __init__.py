@@ -17,8 +17,7 @@ if __name__ == '__main__':
     tracker2 = ObjectTracker(2, (711, 400), lower2, upper2, 1)
     camera1 = Camera(Vector(0, 0, 1), ((80 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180),
                      tracker1)
-    camera2 = Camera(Vector(1, 0, 1), ((100 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180),
-                     tracker2)
+    camera2 = Camera(Vector(1, 0, 1), ((100 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180))
 
     plotter = PositionPlot((camera1, camera2), ((-1, 2), (-1, 2), (1, 2)))
     plotter.start()
@@ -33,7 +32,7 @@ if __name__ == '__main__':
             done = True
 
         for camera in (camera1, camera2):
-            camera.update_ratio()
+            camera.update_camera()
 
         triangulated_position = Camera.triangulate((camera1, camera2))
         if triangulated_position is not None:
