@@ -55,8 +55,8 @@ class Camera:
 
         left, right = cameras
         vector_left, vector_right = left.calculate_vector(), right.calculate_vector()
-        intersection = Camera.intersection(left.position, Vector(*vector_left.xy), right.position,
-                                           Vector(*vector_right.xy))
+        intersection = Camera.intersection(left.position, vector_left.set_z(0), right.position,
+                                           vector_right.set_z(0))
 
         height = Camera.calculate_average_height(cameras, vector_left, vector_right, intersection)
         x, y = intersection

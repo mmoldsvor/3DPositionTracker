@@ -17,6 +17,15 @@ class Vector:
     def yz(self):
         return self.y, self.z
 
+    def set_x(self, x):
+        return Vector(x, *self.yz)
+
+    def set_y(self, y):
+        return Vector(self.x, y, self.z)
+
+    def set_z(self, z):
+        return Vector(*self.xy, z)
+
     def __getitem__(self, item):
         return (self.x, self.y, self.z)[item]
 

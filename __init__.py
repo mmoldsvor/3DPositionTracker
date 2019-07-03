@@ -1,9 +1,12 @@
 import numpy
 import cv2
+import matplotlib.pyplot as plot
+
 from object_tracker import ObjectTracker
 from camera import Camera
 from vector import Vector
 from position_plot import PositionPlot
+
 
 if __name__ == '__main__':
     done = False
@@ -17,11 +20,12 @@ if __name__ == '__main__':
     tracker2 = ObjectTracker(2, (711, 400), lower2, upper2, 1)
     camera1 = Camera(Vector(0, 0, 1), ((80 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180),
                      tracker1)
-    camera2 = Camera(Vector(1, 0, 1), ((100 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180))
+    camera2 = Camera(Vector(1, 0, 1), ((100 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180),
+                     tracker2)
 
     plotter = PositionPlot((camera1, camera2), ((-1, 2), (-1, 2), (1, 2)))
     plotter.start()
-    PositionPlot.show()
+    plot.show()
 
     while not done:
         tracker1.run()
@@ -35,14 +39,11 @@ if __name__ == '__main__':
             camera.update_camera()
 
         triangulated_position = Camera.triangulate((camera1, camera2))
-        if triangulated_position is not None:
-            plotter.position = Vector(*triangulated_position)
-        else:
-            plotter.position = None
+        plotter.position = Vector(*triangulated_position) if triangulated_position is not None else None
 
-        plotter.update()
+        plotter.update_values()
         plotter.update_draw()
-        PositionPlot.pause(1)
+        plot.pause(0.001)
 
     tracker1.video_capture.release()
     tracker2.video_capture.release()

@@ -42,23 +42,23 @@ class PositionPlot:
             for fov in camera.get_fov_xy_vectors():
                 self.draw_line(camera.position, (camera.position + (fov * 7)), 'green')
 
-    def update(self):
+    def update_values(self):
         left, right = tuple(camera.position for camera in self.cameras)
         average_z = (left.z + right.z) / 2
         if self.position is not None:
             self.points['object'] = (self.position, 'red')
-            self.points['object_xy'] = ((*self.position.xy, average_z), 'grey')
+            self.points['object_xy'] = (self.position.set_z(average_z), 'grey')
 
             self.lines['left_line'] = (left, self.position, 'blue', '-')
             self.lines['right_line'] = (right, self.position, 'blue', '-')
-            self.lines['left_xy_line'] = ((*left.xy, average_z), (*self.position.xy, average_z), 'grey', '--')
-            self.lines['right_xy_line'] = ((*right.xy, average_z), (*self.position.xy, average_z), 'grey', '--')
-            self.lines['intersection_line'] = ((*self.position.xy, average_z), self.position, 'grey', '--')
+            self.lines['left_xy_line'] = (left.set_z(average_z), self.position.set_z(average_z), 'grey', '--')
+            self.lines['right_xy_line'] = (right.set_z(average_z), self.position.set_z(average_z), 'grey', '--')
+            self.lines['intersection_line'] = (self.position.set_z(average_z), self.position, 'grey', '--')
         else:
             left_vector, right_vector = tuple(camera.vector for camera in self.cameras)
             self.lines['left_line'] = (left, left + left_vector * 4, 'red', '--') if left_vector is not None else None
-            self.lines['right_line'] = (
-            right, right + right_vector * 4, 'red', '--') if right_vector is not None else None
+            self.lines['right_line'] = (right, right + right_vector * 4, 'red', '--') \
+                if right_vector is not None else None
 
     def update_draw(self):
         if self.position is not None:
@@ -125,11 +125,3 @@ class PositionPlot:
         self.axes.set_zlim3d(*z_bound)
 
         self.draw_static_objects()
-
-    @staticmethod
-    def pause(milliseconds):
-        plot.pause(milliseconds / 1000)
-
-    @staticmethod
-    def show():
-        plot.show()
