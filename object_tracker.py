@@ -36,6 +36,27 @@ class ObjectTracker:
         self.lower_range = lower_range
         self.upper_range = upper_range
 
+    def generate_mask(self, hsv_image):
+        lower_hue, lower_saturation, lower_value = self.lower_range
+        upper_hue, upper_saturation, upper_value = self.upper_range
+
+        if upper_hue / 180 > 0:
+
+            lower_range = numpy.array(self.lower_range, dtype=numpy.uint8)
+            upper_range = numpy.array([180, upper_saturation, upper_value], dtype=numpy.uint8)
+            mask0 = cv2.inRange(hsv_image, lower_range, upper_range)
+
+            lower_range = numpy.array([0, lower_saturation, lower_value], dtype=numpy.uint8)
+            upper_range = numpy.array([upper_hue % 180, upper_saturation, upper_value], dtype=numpy.uint8)
+            mask1 = cv2.inRange(hsv_image, lower_range, upper_range)
+
+            mask = mask0 + mask1
+        else:
+            lower_range = numpy.array(self.lower_range, dtype=numpy.uint8)
+            upper_range = numpy.array(self.upper_range, dtype=numpy.uint8)
+            mask = cv2.inRange(hsv_image, lower_range, upper_range)
+        return mask
+
     def run(self):
         """
         Captures and modifies picture to mask out contours to be tracked. Renders bounding box and centroid
@@ -46,7 +67,7 @@ class ObjectTracker:
         blurred = cv2.GaussianBlur(horizontal_frame, (11, 11), 0)
         hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
-        mask = cv2.inRange(hsv, self.lower_range, self.upper_range)
+        mask = self.generate_mask(hsv)
         mask = cv2.erode(mask, None, iterations=2)
         mask = cv2.dilate(mask, None, iterations=2)
 

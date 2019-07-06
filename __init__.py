@@ -11,13 +11,11 @@ from position_plot import PositionPlot
 if __name__ == '__main__':
     done = False
 
-    lower1 = numpy.array([90, 100, 100], dtype=numpy.uint8)
-    upper1 = numpy.array([110, 255, 255], dtype=numpy.uint8)
-    lower2 = numpy.array([90, 60, 60], dtype=numpy.uint8)
-    upper2 = numpy.array([110, 255, 255], dtype=numpy.uint8)
+    lower = [160, 100, 100]
+    upper = [190, 255, 255]
 
-    tracker1 = ObjectTracker(1, (711, 400), lower1, upper1, 0)
-    tracker2 = ObjectTracker(2, (711, 400), lower2, upper2, 1)
+    tracker1 = ObjectTracker('Left', (711, 400), lower, upper, 2)
+    tracker2 = ObjectTracker('Right', (711, 400), lower, upper, 1)
     camera1 = Camera(Vector(0, 0, 1), ((80 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180),
                      tracker1)
     camera2 = Camera(Vector(1, 0, 1), ((100 * numpy.pi) / 180, 0), ((60 * numpy.pi) / 180, (47 * numpy.pi) / 180),
