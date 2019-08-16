@@ -37,6 +37,13 @@ class ObjectTracker:
         self.upper_range = upper_range
 
     def generate_mask(self, hsv_image):
+        """
+        Generates a the mask of the image. Merges two masks if the hue value is larger than 180.
+        :param hsv_image: numpy.array
+        Cv2 image in hsv mode
+        :return: numpy.array
+        The mask derived from the lower and upper hsv color range
+        """
         lower_hue, lower_saturation, lower_value = self.lower_range
         upper_hue, upper_saturation, upper_value = self.upper_range
 
@@ -72,7 +79,7 @@ class ObjectTracker:
         mask = cv2.dilate(mask, None, iterations=2)
 
         self.find_contours(horizontal_frame, mask)
-        cv2.imshow('window{}'.format(self.identifier), horizontal_frame)
+        cv2.imshow('window{}'.format(self.identifier), mask)
 
     def find_contours(self, frame: numpy.array, mask: numpy.array):
         """
